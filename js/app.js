@@ -250,6 +250,24 @@ export function changeModel(model) {
   state.setModel(model);
   renderReplicas();
   updateExplanation();
+  
+  const modelInfo = document.getElementById('model-info');
+  const modelInfoName = document.getElementById('model-info-name');
+  const modelInfoDesc = document.getElementById('model-info-desc');
+  
+  if (modelInfo && modelInfoName && modelInfoDesc) {
+    const modelDescriptions = {
+      'strict': { name: 'Modelo Strict', desc: 'Consistencia atómica perfecta' },
+      'sequential': { name: 'Modelo Secuencial', desc: 'Todas las operaciones en orden' },
+      'causal': { name: 'Modelo Causal', desc: 'Relaciones causales garantizadas' },
+      'eventual': { name: 'Modelo Eventual', desc: 'Consistencia eventual con stale' }
+    };
+    
+    if (modelDescriptions[model]) {
+      modelInfoName.textContent = modelDescriptions[model].name;
+      modelInfoDesc.textContent = modelDescriptions[model].desc;
+    }
+  }
 }
 
 /**
@@ -279,19 +297,19 @@ function setupEventListeners() {
   if (modelSelectEl) {
     modelSelectEl.addEventListener('change', (e) => changeModel(e.target.value));
     
-    const modelDescriptions = {
-      'strict': { name: 'Modelo Strict', desc: 'Consistencia atómica perfecta' },
-      'sequential': { name: 'Modelo Secuencial', desc: 'Todas las operaciones en orden' },
-      'causal': { name: 'Modelo Causal', desc: 'Relaciones causales garantizadas' },
-      'eventual': { name: 'Modelo Eventual', desc: 'Consistencia eventual con stale' }
-    };
-    
     const modelInfo = document.getElementById('model-info');
     const modelInfoName = document.getElementById('model-info-name');
     const modelInfoDesc = document.getElementById('model-info-desc');
     
     modelSelectEl.addEventListener('mouseenter', () => {
       const selected = modelSelectEl.value;
+      const modelDescriptions = {
+        'strict': { name: 'Modelo Strict', desc: 'Consistencia atómica perfecta' },
+        'sequential': { name: 'Modelo Secuencial', desc: 'Todas las operaciones en orden' },
+        'causal': { name: 'Modelo Causal', desc: 'Relaciones causales garantizadas' },
+        'eventual': { name: 'Modelo Eventual', desc: 'Consistencia eventual con stale' }
+      };
+      
       if (modelDescriptions[selected]) {
         modelInfoName.textContent = modelDescriptions[selected].name;
         modelInfoDesc.textContent = modelDescriptions[selected].desc;
@@ -341,11 +359,9 @@ function setupEventListeners() {
         if (icon.textContent === 'restart_alt') {
           resetSimulator();
         } else if (icon.textContent === 'pause' || icon.textContent === 'play_arrow') {
+          const isActive = btn.classList.contains('active');
           btn.classList.toggle('active');
-          const span = btn.querySelector('span');
-          if (span) {
-            span.textContent = btn.classList.contains('active') ? 'pause' : 'play_arrow';
-          }
+          icon.textContent = isActive ? 'play_arrow' : 'pause';
         }
       }
     });
