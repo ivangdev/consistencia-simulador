@@ -242,6 +242,7 @@ export function resetSimulator() {
   if (countEl) countEl.textContent = '0';
   if (modelSelect) modelSelect.value = currentModel;
   
+  state.setModel(currentModel);
   renderReplicas();
   updateExplanation();
 }
