@@ -6,7 +6,7 @@
   <title>Simulador de Consistencia - v1.0</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;450&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;450&family=Material+Symbols+Outlined:wght,FILL@0..1,opsz@24..48&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -36,19 +36,36 @@
 
   <div class="container">
     <!-- Header -->
-    <header class="flex items-center justify-between mb-lg" style="flex-wrap: wrap; gap: 1rem;">
-      <div class="flex items-center gap-sm">
-        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">⚡</div>
-        <h1 style="font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #6366f1, #5de6ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Simulador de Consistencia</h1>
+    <header class="app-header">
+      <div class="flex items-center gap-md">
+        <div class="app-logo">
+          <span class="material-symbols-outlined">account_tree</span>
+        </div>
+        <div>
+          <h1 class="app-title">Simulador de Consistencia</h1>
+          <span class="app-subtitle">Distributed Systems Lab</span>
+        </div>
       </div>
-      <div class="flex items-center gap-sm">
-        <label for="model-select" class="text-muted">Modelo:</label>
-        <select id="model-select" class="select">
-          <option value="strict">Strict (Estricto)</option>
-          <option value="sequential" selected>Sequential (Secuencial)</option>
-          <option value="causal">Causal</option>
-          <option value="eventual">Eventual</option>
-        </select>
+      <div class="flex items-center gap-lg">
+        <nav class="header-nav">
+          <span class="nav-item active">Simulación</span>
+          <span class="nav-item">Topología</span>
+          <span class="nav-item">Logs</span>
+        </nav>
+        <div class="header-actions">
+          <div class="model-selector">
+            <select id="model-select" class="model-select">
+              <option value="strict">Strict</option>
+              <option value="sequential" selected>Sequential</option>
+              <option value="causal">Causal</option>
+              <option value="eventual">Eventual</option>
+            </select>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <button class="icon-btn">
+            <span class="material-symbols-outlined">settings</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -182,9 +199,108 @@
     <footer class="text-center text-muted" style="padding: 2rem;">
       Simulador de Modelos de Consistencia — Proyecto de Sistemas Distribuidos
     </footer>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-control" title="Rewind">
+        <span class="material-symbols-outlined">fast_rewind</span>
+      </button>
+      <button class="nav-control active" title="Play/Pause">
+        <span class="material-symbols-outlined">pause</span>
+      </button>
+      <button class="nav-control" title="Fast Forward">
+        <span class="material-symbols-outlined">fast_forward</span>
+      </button>
+      <div class="nav-divider"></div>
+      <button class="nav-control" title="Reset">
+        <span class="material-symbols-outlined">restart_alt</span>
+      </button>
+    </nav>
   </div>
 
   <style>
+    /* App Header */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: var(--surface-container);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin: -24px -24px 24px -24px;
+    }
+    
+    .app-logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .app-logo .material-symbols-outlined {
+      color: var(--surface);
+      font-size: 24px;
+    }
+    
+    .app-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--on-surface);
+    }
+    
+    .app-subtitle {
+      font-size: 0.75rem;
+      color: var(--on-surface-variant);
+      font-weight: 500;
+      letter-spacing: 0.05em;
+    }
+    
+    .header-nav {
+      display: flex;
+      gap: 8px;
+    }
+    
+    .nav-item {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    
+    .nav-item:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .nav-item.active {
+      color: var(--secondary);
+      background: rgba(93, 230, 255, 0.1);
+    }
+    
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--outline-variant);
+      background: transparent;
+      color: var(--on-surface-variant);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    
+    .icon-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--on-surface);
+    }
+    
     /* Replica Card specific styles */
     .replica-card {
       padding: 1.5rem;
@@ -248,7 +364,95 @@
     .log-entries::-webkit-scrollbar-thumb:hover {
       background: rgba(255,255,255,0.3);
     }
-  </style>
+    
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      background: var(--surface-container-low);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 9999px;
+      padding: 12px 32px;
+      box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+    }
+    
+    .nav-control {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--outline);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    
+    .nav-control:hover {
+      color: var(--secondary);
+      transform: scale(1.1);
+    }
+    
+    .nav-control.active {
+      color: var(--secondary);
+      background: rgba(93, 230, 255, 0.2);
+    }
+    
+    .nav-divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(255,255,255,0.2);
+    }
+    
+    /* Model Selector */
+    .model-selector {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    .model-select {
+      appearance: none;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 8px 32px 8px 12px;
+      color: var(--on-surface);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    
+    .model-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(192, 193, 255, 0.2);
+    }
+    
+    .model-selector .material-symbols-outlined {
+      position: absolute;
+      right: 8px;
+      pointer-events: none;
+      color: var(--on-surface-variant);
+      font-size: 18px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--spacing-xl);
+      padding-bottom: 120px;
+    }
 
   <script type="module">
     import { init } from './js/app.js';
