@@ -251,13 +251,25 @@
   </style>
 
   <script type="module">
-    import { init, showTutorialModal, hideTutorialModal } from './js/app.js';
-    
+    import { init } from './js/app.js';
+    import { TutorialUI } from './js/tutorial-ui.js';
+    import { TUTORIAL_CONFIG, TUTORIAL_STEPS } from './js/tutorial-steps.js';
+
     // Initialize app
     init();
+
+    // Initialize and start tutorial
+    const tutorial = new TutorialUI(TUTORIAL_CONFIG, TUTORIAL_STEPS);
     
-    // Make hideTutorialModal available globally for onclick
-    window.hideTutorialModal = hideTutorialModal;
+    // Auto-start tutorial on load (if not completed)
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        tutorial.start();
+      }, 500);
+    });
+    
+    // Expose globally for debugging
+    window.tutorial = tutorial;
   </script>
 </body>
 </html>

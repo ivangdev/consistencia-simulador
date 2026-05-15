@@ -1,0 +1,293 @@
+<!-- System Lab - Conflictos y Resoluciones -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conflictos y Resoluciones</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;450&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --surface: #051424;
+      --surface-dim: #051424;
+      --surface-bright: #2c3a4c;
+      --surface-container-lowest: #010f1f;
+      --surface-container-low: #0d1c2d;
+      --surface-container: #122131;
+      --surface-container-high: #1c2b3c;
+      --surface-container-highest: #273647;
+      --on-surface: #d4e4fa;
+      --on-surface-variant: #c7c4d7;
+      --outline: #908fa0;
+      --outline-variant: #464554;
+      --primary: #c0c1ff;
+      --on-primary: #1000a9;
+      --primary-container: #8083ff;
+      --on-primary-container: #0d0096;
+      --secondary: #5de6ff;
+      --secondary-container: #00cbe6;
+      --tertiary: #ffb783;
+      --tertiary-container: #d97721;
+      --error: #ffb4ab;
+      --error-container: #93000a;
+      --on-error-container: #ffdad6;
+      --background: #051424;
+      --on-background: #d4e4fa;
+      --surface-variant: #273647;
+      --primary-fixed: #e1e0ff;
+      --primary-fixed-dim: #c0c1ff;
+      --secondary-fixed: #a2eeff;
+      --secondary-fixed-dim: #2fd9f4;
+      --tertiary-fixed: #ffdcc5;
+      --tertiary-fixed-dim: #ffb783;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--background);
+      color: var(--on-background);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: var(--surface-container);
+      border-bottom: 1px solid var(--outline-variant);
+    }
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-title span {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+    .header-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--outline-variant);
+      background: transparent;
+      color: var(--on-surface-variant);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .main-content {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--on-surface-variant);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .replicas-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .replica-card {
+      background: var(--surface-container);
+      border: 1px solid var(--outline-variant);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      backdrop-filter: blur(12px);
+    }
+    .replica-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .replica-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .replica-label span {
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .status-conflicto {
+      background: var(--error-container);
+      color: var(--on-error-container);
+    }
+    .replica-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .replica-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--surface-container-high);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--secondary);
+    }
+    .replica-data {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .data-label {
+      font-size: 12px;
+      color: var(--on-surface-variant);
+    }
+    .data-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 18px;
+      font-weight: 450;
+      color: var(--on-surface);
+    }
+    .explanation {
+      background: var(--surface-container);
+      border: 1px solid var(--outline-variant);
+      border-radius: 12px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+    }
+    .explanation p {
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--on-surface-variant);
+    }
+    .action-btn {
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, var(--primary), var(--primary-container));
+      color: var(--on-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: all 250ms ease-in-out;
+    }
+    .action-btn:hover {
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+    }
+    .nav-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      padding: 16px 24px;
+      background: var(--surface-container-low);
+      border-top: 1px solid var(--outline-variant);
+    }
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--outline-variant);
+      background: transparent;
+      color: var(--on-surface-variant);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .nav-btn.active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+      border-color: var(--primary-container);
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-title">
+      <span>System Lab</span>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn">⚙️</button>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="section-title">Tutorial de Consistencia Distribuida</div>
+    
+    <div class="replicas-container">
+      <div class="replica-card">
+        <div class="replica-header">
+          <div class="replica-label">
+            <span>Nodo Réplica A</span>
+          </div>
+          <span class="status-badge status-conflicto">Conflicto</span>
+        </div>
+        <div class="replica-content">
+          <div class="replica-icon">📡</div>
+          <div class="replica-data">
+            <span class="data-label">VALOR</span>
+            <span class="data-value">X = 100</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="replica-card">
+        <div class="replica-header">
+          <div class="replica-label">
+            <span>Nodo Réplica B</span>
+          </div>
+          <span class="status-badge status-conflicto">Conflicto</span>
+        </div>
+        <div class="replica-content">
+          <div class="replica-icon">📡</div>
+          <div class="replica-data">
+            <span class="data-label">VALOR</span>
+            <span class="data-value">X = 50</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="explanation">
+      <p>Cuando dos réplicas reciben actualizaciones conflictinges, el modelo de consistencia determina cómo resolver el conflicto.</p>
+    </div>
+
+    <button class="action-btn">Resolver Conflicto</button>
+  </main>
+
+  <nav class="nav-bar">
+    <button class="nav-btn">⏮️</button>
+    <button class="nav-btn">⏸️</button>
+    <button class="nav-btn">⏭️</button>
+  </nav>
+</body>
+</html>

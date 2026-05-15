@@ -16,10 +16,9 @@ export function init() {
   updateExplanation();
   loadLogEntries();
   
-  // Show tutorial modal if not completed
-  if (!state.isTutorialCompleted()) {
-    showTutorialModal();
-  }
+  // Check if tutorial should run (TutorialUI handles its own display)
+  const tutorialCompleted = state.isTutorialCompleted();
+  console.log('Tutorial completed:', tutorialCompleted);
 }
 
 /**
