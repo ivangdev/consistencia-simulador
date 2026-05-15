@@ -675,6 +675,51 @@
       color: var(--on-surface-variant);
     }
     
+    /* Input Styles */
+    .input {
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--on-surface);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.875rem;
+      transition: all 0.25s ease;
+    }
+    
+    .input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(192, 193, 255, 0.2), 0 0 20px rgba(192, 193, 255, 0.1);
+    }
+    
+    .input::placeholder {
+      color: var(--on-surface-variant);
+    }
+    
+    /* Select Styles */
+    .select {
+      appearance: none;
+      padding: 10px 36px 10px 14px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: var(--on-surface);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2390a4b8' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+    }
+    
+    .select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(192, 193, 255, 0.2);
+    }
+    
     /* Improved Buttons */
     .btn {
       display: inline-flex;
@@ -841,6 +886,78 @@
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
+    }
+    
+    .log-entries {
+      max-height: 300px;
+      overflow-y: auto;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    
+    .log-entries::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .log-entries::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.05);
+      border-radius: 3px;
+    }
+    
+    .log-entries::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+    }
+    
+    .log-entries::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
+    .log-entry {
+      display: flex;
+      gap: 1rem;
+      padding: 0.875rem 1rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      border-left: 3px solid;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .log-entry.write { border-left-color: var(--primary); }
+    .log-entry.read { border-left-color: var(--secondary); }
+    .log-entry.warning { border-left-color: var(--tertiary); }
+    .log-entry.error { border-left-color: var(--error); }
+    
+    .log-entry .log-time {
+      color: var(--on-surface-variant);
+      white-space: nowrap;
+      min-width: 60px;
+    }
+    
+    .log-entry-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .log-operation {
+      color: var(--on-surface);
+      font-weight: 500;
+    }
+    
+    .log-result {
+      color: var(--on-surface-variant);
+      font-size: 0.75rem;
     }
     
     /* Explanation Panel */

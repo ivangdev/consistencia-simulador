@@ -173,11 +173,10 @@ function addLogEntry(type, operation, result, badge = null) {
   entry.className = `log-entry ${type}`;
   entry.innerHTML = `
     <span class="log-time">${time}</span>
-    <div style="flex: 1;">
-      <div class="font-mono">${operation}</div>
-      <div class="text-muted text-sm">${result}</div>
+    <div class="log-entry-content">
+      <span class="log-operation">${operation}</span>
+      <span class="log-result">${result}</span>
     </div>
-    ${badge ? `<span class="badge badge-${badge}">${badge}</span>` : ''}
   `;
   
   entries.insertBefore(entry, entries.firstChild);
