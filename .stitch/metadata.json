@@ -1,0 +1,29 @@
+{
+  "name": "projects/8286350419518864996",
+  "projectId": "8286350419518864996",
+  "title": "Consistency Simulator",
+  "visibility": "PRIVATE",
+  "createTime": "2026-05-15T00:00:00.000Z",
+  "updateTime": "2026-05-15T00:00:00.000Z",
+  "projectType": "PROJECT_DESIGN",
+  "origin": "STITCH",
+  "deviceType": "DESKTOP",
+  "designTheme": {
+    "colorMode": "DARK",
+    "font": "INTER",
+    "roundness": "ROUND_EIGHT",
+    "customColor": "#6366f1",
+    "saturation": 3
+  },
+  "screens": {
+    "replica-a-card": {
+      "id": "61c27eb388294490935a5fb7c5a7b798",
+      "sourceScreen": "projects/8286350419518864996/screens/61c27eb388294490935a5fb7c5a7b798",
+      "width": 780,
+      "height": 1768
+    }
+  },
+  "metadata": {
+    "userRole": "OWNER"
+  }
+}

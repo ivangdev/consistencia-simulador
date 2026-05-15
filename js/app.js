@@ -1,0 +1,389 @@
+/**
+ * Consistency Simulator - Main Application
+ */
+
+import * as state from './state.js';
+import { CONSISTENCY_MODELS, getReadResult, getPropagationInfo } from './models.js';
+
+let logEntries = [];
+
+/**
+ * Initialize the application
+ */
+export function init() {
+  renderReplicas();
+  setupEventListeners();
+  updateExplanation();
+  loadLogEntries();
+  
+  // Show tutorial modal if not completed
+  if (!state.isTutorialCompleted()) {
+    showTutorialModal();
+  }
+}
+
+/**
+ * Render replica cards
+ */
+function renderReplicas() {
+  const grid = document.getElementById('replicas-grid');
+  if (!grid) return;
+  
+  const replicas = state.getReplicas();
+  const model = state.getModel();
+  
+  grid.innerHTML = ['A', 'B', 'C'].map(id => {
+    const replica = replicas[id];
+    const replicaState = determineReplicaState(id, replicas, model);
+    
+    return `
+      <div class="glass-card replica-card" id="replica-${id}">
+        <div class="flex items-center justify-between mb-md">
+          <div class="flex items-center gap-sm">
+            <div class="replica-icon">${id}</div>
+            <span class="font-bold">Réplica ${id}</span>
+          </div>
+          <span class="status-badge ${replicaState.stale ? 'warning' : 'success'}">${replicaState.status}</span>
+        </div>
+        <div class="replica-vars">
+          ${renderVarRow('x', replica.x, id)}
+          ${renderVarRow('y', replica.y, id)}
+          ${renderVarRow('z', replica.z, id)}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+/**
+ * Render a single variable row
+ */
+function renderVarRow(name, value, replicaId) {
+  return `
+    <div class="var-row" data-var="${name}" data-replica="${replicaId}">
+      <span class="font-mono text-secondary">${name}</span>
+      <span class="font-mono font-bold">${value}</span>
+    </div>
+  `;
+}
+
+/**
+ * Determine replica state based on model
+ */
+function determineReplicaState(replicaId, replicas, model) {
+  if (model === 'strict' || model === 'sequential' || model === 'causal') {
+    return { status: 'Consistente', stale: false };
+  }
+  
+  // Eventual consistency - might be stale
+  const thisReplica = replicas[replicaId];
+  const hasStale = Object.entries(replicas).some(([id, data]) => {
+    return id !== replicaId && JSON.stringify(data) !== JSON.stringify(thisReplica);
+  });
+  
+  return { 
+    status: hasStale ? 'Posible stale' : 'Consistente', 
+    stale: hasStale 
+  };
+}
+
+/**
+ * Perform a write operation
+ */
+export function performWrite() {
+  const varInput = document.getElementById('write-var');
+  const valueInput = document.getElementById('write-value');
+  const replicaSelect = document.getElementById('write-replica');
+  
+  const varName = varInput.value.trim().toLowerCase();
+  const value = parseInt(valueInput.value);
+  const replica = replicaSelect.value;
+  
+  if (!varName) {
+    alert('Ingresá una variable (x, y, o z)');
+    return;
+  }
+  if (isNaN(value)) {
+    alert('Ingresá un valor numérico');
+    return;
+  }
+  
+  const newState = state.updateReplica(replica, varName, value);
+  const model = newState.model;
+  
+  const propagation = getPropagationInfo(model, replica, varName, value);
+  
+  addLogEntry('write', `Write(${varName}=${value}) @ ${replica}`, propagation.message, propagation.badge);
+  
+  highlightReplica(replica);
+  renderReplicas();
+  updateExplanation();
+  
+  // Clear inputs
+  varInput.value = '';
+  valueInput.value = '';
+}
+
+/**
+ * Perform a read operation
+ */
+export function performRead() {
+  const varInput = document.getElementById('read-var');
+  const replicaSelect = document.getElementById('read-replica');
+  
+  const varName = varInput.value.trim().toLowerCase();
+  const replica = replicaSelect.value;
+  
+  if (!varName) {
+    alert('Ingresá una variable (x, y, o z)');
+    return;
+  }
+  
+  const replicas = state.getReplicas();
+  const model = state.getModel();
+  const replicaData = replicas[replica];
+  
+  const result = getReadResult(model, replicaData, replicas, varName);
+  
+  addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${result.value} ${result.suffix}`, result.badge);
+  
+  highlightReplica(replica);
+  renderReplicas();
+  updateExplanation();
+  
+  // Clear input
+  varInput.value = '';
+}
+
+/**
+ * Add entry to log panel
+ */
+function addLogEntry(type, operation, result, badge = null) {
+  const entries = document.getElementById('log-entries');
+  const countEl = document.getElementById('log-count');
+  
+  if (!entries) return;
+  
+  const now = new Date();
+  const time = now.toTimeString().split(' ')[0];
+  
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  entry.innerHTML = `
+    <span class="log-time">${time}</span>
+    <div style="flex: 1;">
+      <div class="font-mono">${operation}</div>
+      <div class="text-muted text-sm">${result}</div>
+    </div>
+    ${badge ? `<span class="badge badge-${badge}">${badge}</span>` : ''}
+  `;
+  
+  entries.insertBefore(entry, entries.firstChild);
+  
+  // Update count
+  if (countEl) {
+    const count = parseInt(countEl.textContent || '0') + 1;
+    countEl.textContent = count;
+  }
+  
+  // Store in memory
+  logEntries.unshift({ type, operation, result, badge, time });
+}
+
+/**
+ * Highlight a replica (visual feedback)
+ */
+function highlightReplica(replicaId) {
+  const card = document.getElementById(`replica-${replicaId}`);
+  if (card) {
+    card.classList.add('active');
+    setTimeout(() => card.classList.remove('active'), 500);
+  }
+}
+
+/**
+ * Update explanation panel
+ */
+function updateExplanation() {
+  const model = state.getModel();
+  const info = CONSISTENCY_MODELS[model];
+  
+  const nameEl = document.getElementById('model-name');
+  const descEl = document.getElementById('model-explanation');
+  const rulesEl = document.getElementById('model-rules-list');
+  
+  if (nameEl) nameEl.textContent = info.name;
+  if (descEl) descEl.innerHTML = `<p><strong>${info.name}</strong>: ${info.description}</p>`;
+  if (rulesEl) rulesEl.innerHTML = info.rules.map(r => `<li>${r}</li>`).join('');
+}
+
+/**
+ * Reset simulator state
+ */
+export function resetSimulator() {
+  state.resetState();
+  logEntries = [];
+  
+  const entries = document.getElementById('log-entries');
+  const countEl = document.getElementById('log-count');
+  
+  if (entries) {
+    entries.innerHTML = `
+      <div class="log-entry" style="border-left-color: var(--on-surface-variant);">
+        <span class="log-time">--:--:--</span>
+        <div class="text-muted">Estado reseteado — Esperando operaciones...</div>
+      </div>
+    `;
+  }
+  
+  if (countEl) countEl.textContent = '0';
+  
+  renderReplicas();
+  updateExplanation();
+}
+
+/**
+ * Change consistency model
+ */
+export function changeModel(model) {
+  state.setModel(model);
+  renderReplicas();
+  updateExplanation();
+}
+
+/**
+ * Setup event listeners
+ */
+function setupEventListeners() {
+  // Write button
+  const writeBtn = document.getElementById('btn-write');
+  if (writeBtn) {
+    writeBtn.addEventListener('click', performWrite);
+  }
+  
+  // Read button
+  const readBtn = document.getElementById('btn-read');
+  if (readBtn) {
+    readBtn.addEventListener('click', performRead);
+  }
+  
+  // Reset button
+  const resetBtn = document.getElementById('btn-reset');
+  if (resetBtn) {
+    resetBtn.addEventListener('click', resetSimulator);
+  }
+  
+  // Model selector
+  const modelSelect = document.getElementById('model-select');
+  if (modelSelect) {
+    modelSelect.addEventListener('change', (e) => changeModel(e.target.value));
+  }
+  
+  // Challenge toggle
+  const challengeToggle = document.getElementById('challenge-toggle');
+  const challengeBody = document.getElementById('challenge-body');
+  if (challengeToggle && challengeBody) {
+    challengeToggle.addEventListener('click', () => {
+      challengeBody.classList.toggle('open');
+      challengeToggle.querySelector('.challenge-toggle')?.classList.toggle('open');
+    });
+  }
+  
+  // Challenge cards
+  document.querySelectorAll('.challenge-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const challenge = card.dataset.challenge;
+      loadChallenge(challenge);
+    });
+  });
+  
+  // Enter key for inputs
+  document.getElementById('write-var')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') performWrite();
+  });
+  document.getElementById('write-value')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') performWrite();
+  });
+  document.getElementById('read-var')?.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') performRead();
+  });
+}
+
+/**
+ * Load a challenge scenario
+ */
+function loadChallenge(num) {
+  const challenges = {
+    '1': () => {
+      state.resetState();
+      state.setModel('eventual');
+      document.getElementById('model-select').value = 'eventual';
+      updateExplanation();
+      renderReplicas();
+      addLogEntry('warning', 'Challenge: Lost Update', 'Simula dos writes concurrentes en réplicas distintas', 'warning');
+    },
+    '2': () => {
+      // Setup stale state
+      const currentState = state.getState();
+      currentState.replicas.A = { x: 10, y: 0, z: 0 };
+      currentState.replicas.B = { x: 10, y: 0, z: 0 };
+      currentState.replicas.C = { x: 5, y: 0, z: 0 };
+      state.setModel('eventual');
+      document.getElementById('model-select').value = 'eventual';
+      state.saveState(currentState);
+      updateExplanation();
+      renderReplicas();
+      addLogEntry('warning', 'Challenge: Stale Read', 'Replica C tiene x=5 (stale). Intenta leer desde C.', 'warning');
+    },
+    '3': () => {
+      state.resetState();
+      state.setModel('causal');
+      document.getElementById('model-select').value = 'causal';
+      updateExplanation();
+      renderReplicas();
+      addLogEntry('warning', 'Challenge: Causal Violation', 'Escribe en A, luego lee de B. ¿B ve el write?', 'warning');
+    }
+  };
+  
+  if (challenges[num]) {
+    challenges[num]();
+  }
+}
+
+/**
+ * Show tutorial modal
+ */
+export function showTutorialModal() {
+  const modal = document.getElementById('tutorial-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+/**
+ * Hide tutorial modal
+ */
+export function hideTutorialModal() {
+  const modal = document.getElementById('tutorial-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    state.completeTutorial();
+  }
+}
+
+/**
+ * Load log entries from memory (for persistence)
+ */
+function loadLogEntries() {
+  // For now, just render empty state
+}
+
+export default {
+  init,
+  performWrite,
+  performRead,
+  resetSimulator,
+  changeModel,
+  showTutorialModal,
+  hideTutorialModal
+};
