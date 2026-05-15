@@ -308,6 +308,88 @@ function setupEventListeners() {
   document.getElementById('read-var')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') performRead();
   });
+  
+  // Bottom nav controls
+  document.querySelectorAll('.nav-control').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon) {
+        if (icon.textContent === 'restart_alt') {
+          resetSimulator();
+        } else if (icon.textContent === 'pause' || icon.textContent === 'play_arrow') {
+          btn.classList.toggle('active');
+          const span = btn.querySelector('span');
+          if (span) {
+            span.textContent = btn.classList.contains('active') ? 'pause' : 'play_arrow';
+          }
+        }
+      }
+    });
+  });
+  
+  // Model selector hover info
+  const modelSelect = document.getElementById('model-select');
+  const modelInfo = document.getElementById('model-info');
+  const modelInfoName = document.getElementById('model-info-name');
+  const modelInfoDesc = document.getElementById('model-info-desc');
+  
+  if (modelSelect && modelInfo) {
+    const modelDescriptions = {
+      'strict': { name: 'Modelo Strict', desc: 'Consistencia atómica perfecta' },
+      'sequential': { name: 'Modelo Secuencial', desc: 'Todas las operaciones en orden' },
+      'causal': { name: 'Modelo Causal', desc: 'Relaciones causales garantizadas' },
+      'eventual': { name: 'Modelo Eventual', desc: 'Consistencia eventual con stale' }
+    };
+    
+    modelSelect.addEventListener('mouseenter', () => {
+      const selected = modelSelect.value;
+      if (modelDescriptions[selected]) {
+        modelInfoName.textContent = modelDescriptions[selected].name;
+        modelInfoDesc.textContent = modelDescriptions[selected].desc;
+        modelInfo.classList.add('visible');
+      }
+    });
+    
+    modelSelect.addEventListener('mouseleave', () => {
+      modelInfo.classList.remove('visible');
+    });
+  }
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    
+    const shortcutsHint = document.getElementById('shortcuts-hint');
+    
+    if (e.key === '?') {
+      shortcutsHint?.classList.toggle('visible');
+      return;
+    }
+    
+    if (shortcutsHint?.classList.contains('visible')) {
+      setTimeout(() => shortcutsHint.classList.remove('visible'), 2000);
+    }
+    
+    if (e.key === 'r' || e.key === 'R') {
+      resetSimulator();
+    } else if (e.key === 'w' || e.key === 'W') {
+      document.getElementById('write-var')?.focus();
+    } else if (e.key === 's' || e.key === 'S') {
+      document.getElementById('read-var')?.focus();
+    } else if (e.key === '1') {
+      document.getElementById('model-select').value = 'strict';
+      changeModel('strict');
+    } else if (e.key === '2') {
+      document.getElementById('model-select').value = 'sequential';
+      changeModel('sequential');
+    } else if (e.key === '3') {
+      document.getElementById('model-select').value = 'causal';
+      changeModel('causal');
+    } else if (e.key === '4') {
+      document.getElementById('model-select').value = 'eventual';
+      changeModel('eventual');
+    }
+  });
 }
 
 /**
