@@ -205,8 +205,8 @@ function highlightReplica(replicaId) {
 /**
  * Update explanation panel
  */
-function updateExplanation() {
-  const model = state.getModel();
+function updateExplanation(overrideModel = null) {
+  const model = overrideModel || state.getModel();
   const info = CONSISTENCY_MODELS[model];
   
   const nameEl = document.getElementById('model-name');
@@ -240,11 +240,12 @@ export function resetSimulator() {
   }
   
   if (countEl) countEl.textContent = '0';
-  if (modelSelect) modelSelect.value = currentModel;
   
   state.setModel(currentModel);
+  if (modelSelect) modelSelect.value = currentModel;
+  
   renderReplicas();
-  updateExplanation();
+  updateExplanation(currentModel);
 }
 
 /**
