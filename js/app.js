@@ -36,7 +36,7 @@ function renderReplicas() {
     const replicaState = determineReplicaState(id, replicas, model);
     
     return `
-      <div class="glass-card replica-card" id="replica-${id}">
+      <div class="glass-card replica-card" id="replica-${id}" data-replica="${id}">
         <div class="replica-header">
           <div class="replica-title">
             <div class="replica-icon">${id}</div>
@@ -222,11 +222,13 @@ function updateExplanation() {
  * Reset simulator state
  */
 export function resetSimulator() {
+  const currentModel = state.getModel();
   state.resetState();
   logEntries = [];
   
   const entries = document.getElementById('log-entries');
   const countEl = document.getElementById('log-count');
+  const modelSelect = document.getElementById('model-select');
   
   if (entries) {
     entries.innerHTML = `
@@ -238,6 +240,7 @@ export function resetSimulator() {
   }
   
   if (countEl) countEl.textContent = '0';
+  if (modelSelect) modelSelect.value = currentModel;
   
   renderReplicas();
   updateExplanation();
