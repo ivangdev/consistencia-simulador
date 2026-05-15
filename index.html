@@ -11,25 +11,45 @@
 </head>
 <body>
   <!-- Tutorial Modal -->
-  <div id="tutorial-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-      <div class="text-center mb-md">
-        <span style="font-size: 2rem;">📖</span>
-        <h2 class="text-lg font-bold mt-md">Tutorial</h2>
+  <div id="tutorial-modal" class="modal-overlay">
+    <div class="tutorial-content">
+      <div class="tutorial-header">
+        <div class="tutorial-progress">
+          <span class="tutorial-step">PASO 1 DE 6</span>
+          <div class="progress-bar">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+        <button class="tutorial-close" onclick="hideTutorialModal()">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
-      <p class="text-muted text-center mb-lg">
-        Bienvenido al Simulador de Consistencia. Esta herramienta te enseña cómo los sistemas distribuidos manejan la consistencia de datos.
-      </p>
-      <div class="progress-dots mb-lg">
-        <span class="active"></span>
-        <span></span>
-        <span></span>
-        <span></span>
-        <span></span>
+      <div class="tutorial-body">
+        <div class="tutorial-icon">
+          <span class="material-symbols-outlined">school</span>
+        </div>
+        <h2 class="tutorial-title">Bienvenido al Simulador</h2>
+        <p class="tutorial-text">
+          Esta herramienta te enseña cómo los sistemas distribuidos manejan la consistencia de datos.
+        </p>
+        <div class="tutorial-visual">
+          <div class="visual-node">A</div>
+          <div class="visual-hub">
+            <span class="material-symbols-outlined">hub</span>
+          </div>
+          <div class="visual-node">B</div>
+          <div class="visual-hub">
+            <span class="material-symbols-outlined">hub</span>
+          </div>
+          <div class="visual-node">C</div>
+        </div>
       </div>
-      <div class="flex gap-md">
-        <button class="btn btn-secondary flex-1" onclick="hideTutorialModal()">Saltar</button>
-        <button class="btn btn-primary flex-1" onclick="hideTutorialModal()">Comenzar</button>
+      <div class="tutorial-actions">
+        <button class="btn btn-secondary" onclick="hideTutorialModal()">Saltar</button>
+        <button class="btn btn-primary" onclick="hideTutorialModal()">
+          Comenzar
+          <span class="material-symbols-outlined">arrow_forward</span>
+        </button>
       </div>
     </div>
   </div>
@@ -199,33 +219,57 @@
         </div>
         <span class="material-symbols-outlined challenge-toggle">expand_more</span>
       </div>
-      <div id="challenge-body" style="padding: 1.5rem; display: none;">
-        <div class="grid-3">
-          <div class="challenge-card glass-card" data-challenge="1" style="padding: 1.25rem; cursor: pointer;">
-            <div class="font-bold mb-sm">Lost Update</div>
-            <div class="text-muted text-sm mb-md">Dos clientes escriben simultáneamente. ¿Se pierde alguna actualización?</div>
-            <div class="difficulty-dots">
-              <span class="active"></span>
-              <span class="active"></span>
-              <span></span>
+<div id="challenge-body" class="challenge-body">
+        <div class="challenge-grid">
+          <div class="challenge-card glass-card" data-challenge="1">
+            <div class="challenge-icon">
+              <span class="material-symbols-outlined">sync_problem</span>
+            </div>
+            <div class="challenge-info">
+              <h3 class="challenge-title">Lost Update</h3>
+              <p class="challenge-desc">Dos clientes escriben simultáneamente. ¿Se pierde alguna actualización?</p>
+            </div>
+            <div class="challenge-difficulty">
+              <span class="diff-dot active"></span>
+              <span class="diff-dot active"></span>
+              <span class="diff-dot"></span>
+            </div>
+            <div class="challenge-action">
+              <span class="material-symbols-outlined">play_arrow</span>
             </div>
           </div>
-          <div class="challenge-card glass-card" data-challenge="2" style="padding: 1.25rem; cursor: pointer;">
-            <div class="font-bold mb-sm">Stale Read</div>
-            <div class="text-muted text-sm mb-md">Un cliente lee datos obsoletos después de una escritura.</div>
-            <div class="difficulty-dots">
-              <span class="active"></span>
-              <span class="active"></span>
-              <span class="active"></span>
+          <div class="challenge-card glass-card" data-challenge="2">
+            <div class="challenge-icon">
+              <span class="material-symbols-outlined">schedule</span>
+            </div>
+            <div class="challenge-info">
+              <h3 class="challenge-title">Stale Read</h3>
+              <p class="challenge-desc">Un cliente lee datos obsoletos después de una escritura.</p>
+            </div>
+            <div class="challenge-difficulty">
+              <span class="diff-dot active"></span>
+              <span class="diff-dot active"></span>
+              <span class="diff-dot active"></span>
+            </div>
+            <div class="challenge-action">
+              <span class="material-symbols-outlined">play_arrow</span>
             </div>
           </div>
-          <div class="challenge-card glass-card" data-challenge="3" style="padding: 1.25rem; cursor: pointer;">
-            <div class="font-bold mb-sm">Causal Violation</div>
-            <div class="text-muted text-sm mb-md">El orden causal de eventos no se respeta.</div>
-            <div class="difficulty-dots">
-              <span class="active"></span>
-              <span class="active"></span>
-              <span class="active"></span>
+          <div class="challenge-card glass-card" data-challenge="3">
+            <div class="challenge-icon">
+              <span class="material-symbols-outlined">account_tree</span>
+            </div>
+            <div class="challenge-info">
+              <h3 class="challenge-title">Causal Violation</h3>
+              <p class="challenge-desc">El orden causal de eventos no se respeta.</p>
+            </div>
+            <div class="challenge-difficulty">
+              <span class="diff-dot active"></span>
+              <span class="diff-dot active"></span>
+              <span class="diff-dot active"></span>
+            </div>
+            <div class="challenge-action">
+              <span class="material-symbols-outlined">play_arrow</span>
             </div>
           </div>
         </div>
@@ -744,13 +788,272 @@
       transform: rotate(180deg);
     }
     
+    .challenge-body {
+      padding: 1.5rem;
+      display: none;
+    }
+    
+    .challenge-body.open {
+      display: block;
+    }
+    
+    .challenge-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    
+    .challenge-card {
+      padding: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+    
+    .challenge-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--primary);
+      box-shadow: 0 10px 30px -5px rgba(99, 102, 241, 0.3);
+    }
+    
+    .challenge-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .challenge-icon .material-symbols-outlined {
+      font-size: 24px;
+      color: var(--surface);
+    }
+    
+    .challenge-info {
+      flex: 1;
+    }
+    
+    .challenge-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--on-surface);
+      margin-bottom: 0.25rem;
+    }
+    
+    .challenge-desc {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+      line-height: 1.4;
+    }
+    
+    .challenge-difficulty {
+      display: flex;
+      gap: 4px;
+    }
+    
+    .diff-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--outline);
+    }
+    
+    .diff-dot.active {
+      background: var(--tertiary);
+      box-shadow: 0 0 8px rgba(255, 183, 131, 0.5);
+    }
+    
+    .challenge-action {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 32px;
+      height: 32px;
+      background: var(--surface-container-high);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: all 0.25s ease;
+    }
+    
+    .challenge-action .material-symbols-outlined {
+      font-size: 18px;
+      color: var(--secondary);
+    }
+    
+    .challenge-card:hover .challenge-action {
+      opacity: 1;
+    }
+    
     .container {
       max-width: 1200px;
       margin: 0 auto;
       padding: var(--spacing-xl);
       padding-bottom: 120px;
     }
-
+    
+    /* Tutorial Modal */
+    .tutorial-content {
+      background: var(--surface-container);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px;
+      max-width: 520px;
+      width: 90%;
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0,0,0,0.5);
+    }
+    
+    .tutorial-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      background: var(--surface-container-high);
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .tutorial-progress {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .tutorial-step {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--secondary);
+    }
+    
+    .progress-bar {
+      width: 120px;
+      height: 4px;
+      background: var(--surface-container-highest);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      width: 16.66%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 2px;
+    }
+    
+    .tutorial-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: transparent;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+    }
+    
+    .tutorial-close:hover {
+      background: rgba(255,255,255,0.1);
+      color: var(--on-surface);
+    }
+    
+    .tutorial-body {
+      padding: 2rem;
+      text-align: center;
+    }
+    
+    .tutorial-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+    
+    .tutorial-icon .material-symbols-outlined {
+      font-size: 40px;
+      color: var(--surface);
+    }
+    
+    .tutorial-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--on-surface);
+      margin-bottom: 0.75rem;
+    }
+    
+    .tutorial-text {
+      font-size: 1rem;
+      color: var(--on-surface-variant);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    
+    .tutorial-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      padding: 1.5rem;
+      background: rgba(0,0,0,0.2);
+      border-radius: 16px;
+    }
+    
+    .visual-node {
+      width: 48px;
+      height: 48px;
+      background: var(--surface-container-highest);
+      border: 2px solid var(--secondary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--secondary);
+    }
+    
+    .visual-hub {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .visual-hub .material-symbols-outlined {
+      font-size: 24px;
+      color: var(--primary);
+    }
+    
+    .tutorial-actions {
+      display: flex;
+      gap: 1rem;
+      padding: 1.5rem;
+      background: var(--surface-container-low);
+      border-top: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .tutorial-actions .btn {
+      flex: 1;
+      justify-content: center;
+    }
+    
+    </style>
   <script type="module">
     import { init } from './js/app.js';
     import { TutorialUI } from './js/tutorial-ui.js';
@@ -761,14 +1064,14 @@
 
     // Initialize and start tutorial
     const tutorial = new TutorialUI(TUTORIAL_CONFIG, TUTORIAL_STEPS);
-    
+
     // Auto-start tutorial on load (if not completed)
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         tutorial.start();
       }, 500);
     });
-    
+
     // Expose globally for debugging
     window.tutorial = tutorial;
   </script>
