@@ -11,7 +11,7 @@
 </head>
 <body>
   <!-- Tutorial Modal -->
-  <div id="tutorial-modal" class="modal-overlay">
+  <div id="tutorial-modal" class="modal-overlay" style="display: none;">
     <div class="tutorial-content">
       <div class="tutorial-header">
         <div class="tutorial-progress">
@@ -1588,12 +1588,12 @@
     // Initialize and start tutorial
     const tutorial = new TutorialUI(TUTORIAL_CONFIG, TUTORIAL_STEPS);
 
-    // Auto-start tutorial on load (if not completed)
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        tutorial.start();
-      }, 500);
-    });
+    // Auto-start tutorial on load (if not completed) - disabled, using HTML modal instead
+    // document.addEventListener('DOMContentLoaded', () => {
+    //   setTimeout(() => {
+    //     tutorial.start();
+    //   }, 500);
+    // });
 
     // Expose globally for debugging
     window.tutorial = tutorial;
