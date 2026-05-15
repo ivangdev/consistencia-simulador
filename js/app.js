@@ -37,12 +37,15 @@ function renderReplicas() {
     
     return `
       <div class="glass-card replica-card" id="replica-${id}">
-        <div class="flex items-center justify-between mb-md">
-          <div class="flex items-center gap-sm">
+        <div class="replica-header">
+          <div class="replica-title">
             <div class="replica-icon">${id}</div>
-            <span class="font-bold">Réplica ${id}</span>
+            <span class="replica-label">Réplica ${id}</span>
           </div>
-          <span class="status-badge ${replicaState.stale ? 'warning' : 'success'}">${replicaState.status}</span>
+          <div class="replica-status">
+            <span class="status-dot ${replicaState.stale ? 'stale' : ''}"></span>
+            <span class="status-label">${replicaState.status}</span>
+          </div>
         </div>
         <div class="replica-vars">
           ${renderVarRow('x', replica.x, id)}
