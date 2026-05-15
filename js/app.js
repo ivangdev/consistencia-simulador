@@ -275,9 +275,33 @@ function setupEventListeners() {
   }
   
   // Model selector
-  const modelSelect = document.getElementById('model-select');
-  if (modelSelect) {
-    modelSelect.addEventListener('change', (e) => changeModel(e.target.value));
+  const modelSelectEl = document.getElementById('model-select');
+  if (modelSelectEl) {
+    modelSelectEl.addEventListener('change', (e) => changeModel(e.target.value));
+    
+    const modelDescriptions = {
+      'strict': { name: 'Modelo Strict', desc: 'Consistencia atómica perfecta' },
+      'sequential': { name: 'Modelo Secuencial', desc: 'Todas las operaciones en orden' },
+      'causal': { name: 'Modelo Causal', desc: 'Relaciones causales garantizadas' },
+      'eventual': { name: 'Modelo Eventual', desc: 'Consistencia eventual con stale' }
+    };
+    
+    const modelInfo = document.getElementById('model-info');
+    const modelInfoName = document.getElementById('model-info-name');
+    const modelInfoDesc = document.getElementById('model-info-desc');
+    
+    modelSelectEl.addEventListener('mouseenter', () => {
+      const selected = modelSelectEl.value;
+      if (modelDescriptions[selected]) {
+        modelInfoName.textContent = modelDescriptions[selected].name;
+        modelInfoDesc.textContent = modelDescriptions[selected].desc;
+        modelInfo.classList.add('visible');
+      }
+    });
+    
+    modelSelectEl.addEventListener('mouseleave', () => {
+      modelInfo.classList.remove('visible');
+    });
   }
   
   // Challenge toggle
@@ -328,33 +352,6 @@ function setupEventListeners() {
   });
   
   // Model selector hover info
-  const modelSelect = document.getElementById('model-select');
-  const modelInfo = document.getElementById('model-info');
-  const modelInfoName = document.getElementById('model-info-name');
-  const modelInfoDesc = document.getElementById('model-info-desc');
-  
-  if (modelSelect && modelInfo) {
-    const modelDescriptions = {
-      'strict': { name: 'Modelo Strict', desc: 'Consistencia atómica perfecta' },
-      'sequential': { name: 'Modelo Secuencial', desc: 'Todas las operaciones en orden' },
-      'causal': { name: 'Modelo Causal', desc: 'Relaciones causales garantizadas' },
-      'eventual': { name: 'Modelo Eventual', desc: 'Consistencia eventual con stale' }
-    };
-    
-    modelSelect.addEventListener('mouseenter', () => {
-      const selected = modelSelect.value;
-      if (modelDescriptions[selected]) {
-        modelInfoName.textContent = modelDescriptions[selected].name;
-        modelInfoDesc.textContent = modelDescriptions[selected].desc;
-        modelInfo.classList.add('visible');
-      }
-    });
-    
-    modelSelect.addEventListener('mouseleave', () => {
-      modelInfo.classList.remove('visible');
-    });
-  }
-  
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
