@@ -106,7 +106,7 @@ export class TutorialUI {
     if (html) {
       const bodyContent = this.extractBodyContent(html);
       this.modalEl.innerHTML = bodyContent;
-      this.applyStyles(bodyContent);
+      this.applyStyles(html);
       this.attachStepListeners(step);
     }
 
@@ -120,13 +120,12 @@ export class TutorialUI {
     if (bodyMatch) {
       return bodyMatch[1];
     }
-    const bodyWithoutTags = html.replace(/<[^>]+>/g, '');
     return html;
   }
 
   applyStyles(html) {
     const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
-    if (styleMatch) {
+    if (styleMatch && styleMatch[1]) {
       const styleContent = styleMatch[1];
       const existingStyle = document.getElementById('tutorial-dynamic-styles');
       if (existingStyle) {
