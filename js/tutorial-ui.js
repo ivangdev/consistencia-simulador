@@ -63,18 +63,20 @@ export class TutorialUI {
       top: "50%",
       left: "50%",
       transform: "translate(-50%, -50%)",
-      maxWidth: "420px",
+      maxWidth: "450px",
       width: "90%",
-      maxHeight: "80vh",
+      maxHeight: "85vh",
       overflow: "auto",
-      background: "var(--surface-container)",
-      border: "1px solid var(--outline-variant)",
-      borderRadius: "16px",
-      backdropFilter: "blur(20px)",
+      padding: "0",
+      margin: "0",
+      border: "none",
+      borderRadius: "0",
+      background: "transparent",
+      backdropFilter: "none",
       zIndex: this.config.modalZIndex + 1,
       opacity: "0",
       pointerEvents: "none",
-      transition: "opacity 0.3s ease-in-out, transform 0.3s ease-in-out"
+      transition: "opacity 0.3s ease-in-out"
     });
     document.body.appendChild(this.modalEl);
   }
@@ -102,13 +104,40 @@ export class TutorialUI {
   showStep(step) {
     const html = this.loadedHTMLs[step.id];
     if (html) {
-      this.modalEl.innerHTML = html;
+      const bodyContent = this.extractBodyContent(html);
+      this.modalEl.innerHTML = bodyContent;
+      this.applyStyles(bodyContent);
       this.attachStepListeners(step);
     }
 
     this.positionSpotlight(step);
     this.showElements();
     this.saveProgress();
+  }
+
+  extractBodyContent(html) {
+    const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+    if (bodyMatch) {
+      return bodyMatch[1];
+    }
+    const bodyWithoutTags = html.replace(/<[^>]+>/g, '');
+    return html;
+  }
+
+  applyStyles(html) {
+    const styleMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+    if (styleMatch) {
+      const styleContent = styleMatch[1];
+      const existingStyle = document.getElementById('tutorial-dynamic-styles');
+      if (existingStyle) {
+        existingStyle.textContent = styleContent;
+      } else {
+        const styleEl = document.createElement('style');
+        styleEl.id = 'tutorial-dynamic-styles';
+        styleEl.textContent = styleContent;
+        document.head.appendChild(styleEl);
+      }
+    }
   }
 
   positionSpotlight(step) {
