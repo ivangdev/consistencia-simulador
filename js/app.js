@@ -3,6 +3,7 @@
  */
 
 import * as state from './state.js';
+import { incrementOps } from './state.js';
 import { CONSISTENCY_MODELS, getReadResult, getPropagationInfo } from './models.js';
 
 let logEntries = [];
@@ -102,8 +103,10 @@ export function performWrite() {
   const replica = replicaSelect.value;
   
   if (!varName) {
-    alert('Ingresá una variable (x, y, o z)');
-    return;
+    return; // Silently ignore empty variable names
+  }
+  if (!['x', 'y', 'z'].includes(varName)) {
+    return; // Silently ignore invalid variable names
   }
   if (isNaN(value)) {
     alert('Ingresá un valor numérico');
@@ -147,8 +150,9 @@ export function performRead() {
   
   const result = getReadResult(model, replica, replicaData, replicas, varName);
   
-  addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${result.value} ${result.suffix}`, result.badge);
-  
+addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${result.value} ${result.suffix}`, result.badge);
+  incrementOps();
+
   highlightReplica(replica);
   renderReplicas();
   updateExplanation();
@@ -163,9 +167,14 @@ export function performRead() {
 function addLogEntry(type, operation, result, badge = null) {
   const entries = document.getElementById('log-entries');
   const countEl = document.getElementById('log-count');
-  
+
   if (!entries) return;
-  
+
+  const placeholder = entries.querySelector('.log-entry .text-muted');
+  if (placeholder) {
+    entries.innerHTML = '';
+  }
+
   const now = new Date();
   const time = now.toTimeString().split(' ')[0];
   
@@ -457,6 +466,11 @@ function setupEventListeners() {
       return;
     }
     
+    if (e.key === 'Escape') {
+      shortcutsHint?.classList.remove('visible');
+      return;
+    }
+
     if (shortcutsHint?.classList.contains('visible')) {
       setTimeout(() => shortcutsHint.classList.remove('visible'), 2000);
     }
@@ -544,6 +558,9 @@ export function hideTutorialModal() {
     state.completeTutorial();
   }
 }
+
+// Expose globally for inline onclick handlers in HTML
+window.hideTutorialModal = hideTutorialModal;
 
 /**
  * Load log entries from memory (for persistence)

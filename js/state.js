@@ -41,9 +41,15 @@ export function saveState(state) {
 
 /**
  * Update replica value
- * For strict/sequential consistency, propagate to ALL replicas
+ * For strict/sequential: propagate to ALL replicas immediately
+ * For causal/eventual: only update the target replica (eventual propagates lazily)
  */
 export function updateReplica(replicaId, varName, value) {
+  // Validate variable name - only x, y, z allowed
+  if (!['x', 'y', 'z'].includes(varName)) {
+    return getState(); // Silently reject invalid variable names
+  }
+  
   const state = getState();
   state.replicas[replicaId][varName] = value;
   
@@ -54,6 +60,8 @@ export function updateReplica(replicaId, varName, value) {
       state.replicas[id][varName] = value;
     });
   }
+  // Causal and Eventual: only update target replica (lazy propagation)
+  // No automatic propagation - replicas sync asynchronously
   
   state.lastWriteReplica = replicaId;
   state.lastWriteVar = varName;
