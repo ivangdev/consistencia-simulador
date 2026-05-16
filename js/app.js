@@ -459,6 +459,11 @@ function setupEventListeners() {
       return;
     }
     
+    if (e.key === 'Escape') {
+      shortcutsHint?.classList.remove('visible');
+      return;
+    }
+
     if (shortcutsHint?.classList.contains('visible')) {
       setTimeout(() => shortcutsHint.classList.remove('visible'), 2000);
     }
