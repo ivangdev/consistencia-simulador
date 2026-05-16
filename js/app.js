@@ -145,7 +145,7 @@ export function performRead() {
   const model = state.getModel();
   const replicaData = replicas[replica];
   
-  const result = getReadResult(model, replicaData, replicas, varName);
+  const result = getReadResult(model, replica, replicaData, replicas, varName);
   
   addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${result.value} ${result.suffix}`, result.badge);
   

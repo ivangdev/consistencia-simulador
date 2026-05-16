@@ -76,7 +76,7 @@ export function mightHaveStaleData(model, replicaId, otherReplicas) {
 /**
  * Get read result info based on model
  */
-export function getReadResult(model, replicaData, allReplicas, varName) {
+export function getReadResult(model, replicaId, replicaData, allReplicas, varName) {
   const modelInfo = CONSISTENCY_MODELS[model];
   
   if (model === 'strict' || model === 'sequential') {
