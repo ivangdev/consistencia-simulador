@@ -26,10 +26,10 @@ export function getState() {
     try {
       return JSON.parse(saved);
     } catch {
-      return { ...INITIAL_STATE };
+      return JSON.parse(JSON.stringify(INITIAL_STATE));
     }
   }
-  return { ...INITIAL_STATE };
+  return JSON.parse(JSON.stringify(INITIAL_STATE));
 }
 
 /**
@@ -107,7 +107,9 @@ export function setModel(model) {
  * Reset state to initial
  */
 export function resetState() {
-  const state = { ...INITIAL_STATE };
+  // Deep clone to avoid mutating INITIAL_STATE
+  const state = JSON.parse(JSON.stringify(INITIAL_STATE));
+  state.model = 'sequential'; // Reset to default model
   saveState(state);
   return state;
 }
