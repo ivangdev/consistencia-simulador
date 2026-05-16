@@ -41,10 +41,20 @@ export function saveState(state) {
 
 /**
  * Update replica value
+ * For strict/sequential consistency, propagate to ALL replicas
  */
 export function updateReplica(replicaId, varName, value) {
   const state = getState();
   state.replicas[replicaId][varName] = value;
+  
+  // Strict and Sequential: propagate immediately to all replicas
+  if (state.model === 'strict' || state.model === 'sequential') {
+    const otherReplicas = ['A', 'B', 'C'].filter(id => id !== replicaId);
+    otherReplicas.forEach(id => {
+      state.replicas[id][varName] = value;
+    });
+  }
+  
   state.lastWriteReplica = replicaId;
   state.lastWriteVar = varName;
   state.lastWriteValue = value;
