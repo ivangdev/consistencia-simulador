@@ -167,9 +167,14 @@ addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${result.value} ${resu
 function addLogEntry(type, operation, result, badge = null) {
   const entries = document.getElementById('log-entries');
   const countEl = document.getElementById('log-count');
-  
+
   if (!entries) return;
-  
+
+  const placeholder = entries.querySelector('.log-entry .text-muted');
+  if (placeholder) {
+    entries.innerHTML = '';
+  }
+
   const now = new Date();
   const time = now.toTimeString().split(' ')[0];
   
