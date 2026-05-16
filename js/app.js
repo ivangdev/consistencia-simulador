@@ -300,20 +300,23 @@ function setupEventListeners() {
   // Model selector
   const modelSelectEl = document.getElementById('model-select');
   if (modelSelectEl) {
+    const modelDescriptions = {
+      'strict': { name: 'Modelo Strict', desc: 'Consistencia atómica perfecta' },
+      'sequential': { name: 'Modelo Secuencial', desc: 'Todas las operaciones en orden' },
+      'causal': { name: 'Modelo Causal', desc: 'Relaciones causales garantizadas' },
+      'eventual': { name: 'Modelo Eventual', desc: 'Consistencia eventual con stale' }
+    };
+    
     modelSelectEl.addEventListener('change', (e) => changeModel(e.target.value));
     
     const modelInfo = document.getElementById('model-info');
     const modelInfoName = document.getElementById('model-info-name');
     const modelInfoDesc = document.getElementById('model-info-desc');
     
+    modelSelectEl.title = 'Seleccionar modelo de consistencia';
+    
     modelSelectEl.addEventListener('mouseenter', () => {
       const selected = modelSelectEl.value;
-      const modelDescriptions = {
-        'strict': { name: 'Modelo Strict', desc: 'Consistencia atómica perfecta' },
-        'sequential': { name: 'Modelo Secuencial', desc: 'Todas las operaciones en orden' },
-        'causal': { name: 'Modelo Causal', desc: 'Relaciones causales garantizadas' },
-        'eventual': { name: 'Modelo Eventual', desc: 'Consistencia eventual con stale' }
-      };
       
       if (modelDescriptions[selected]) {
         modelInfoName.textContent = modelDescriptions[selected].name;
@@ -340,8 +343,43 @@ function setupEventListeners() {
   // Challenge cards
   document.querySelectorAll('.challenge-card').forEach(card => {
     card.addEventListener('click', () => {
-      const challenge = card.dataset.challenge;
-      loadChallenge(challenge);
+      const wasExpanded = card.classList.contains('expanded');
+      
+      // Collapse all cards first
+      document.querySelectorAll('.challenge-card').forEach(c => {
+        c.classList.remove('expanded');
+        const desc = c.querySelector('.challenge-description');
+        if (desc) desc.remove();
+      });
+      
+      // If it wasn't already expanded, expand it
+      if (!wasExpanded) {
+        card.classList.add('expanded');
+        
+        const challengeNum = card.dataset.challenge;
+        const descriptions = {
+          '1': 'Lost Update: Dos clientes escriben simultáneamente en réplicas distintas. ¿Se pierde alguna actualización? Escribe x=10 en A y x=20 en B simultáneamente.',
+          '2': 'Stale Read: Un cliente lee datos obsoletos después de una escritura. Escribe x=100 en A, luego intenta leer x desde C (que aún tiene el valor antiguo).',
+          '3': 'Causal Violation: El orden causal de eventos no se respeta. Escribe en A, luego lee de B para verificar si B vio el write de A.'
+        };
+        
+        const desc = document.createElement('div');
+        desc.className = 'challenge-description';
+        desc.style.cssText = `
+          padding: 12px;
+          background: rgba(0,0,0,0.3);
+          border-radius: 8px;
+          margin-top: 8px;
+          font-size: 0.875rem;
+          color: var(--on-surface-variant);
+          line-height: 1.5;
+        `;
+        desc.textContent = descriptions[challengeNum] || '';
+        card.querySelector('.challenge-info')?.appendChild(desc);
+        
+        // Also trigger challenge loading
+        loadChallenge(challengeNum);
+      }
     });
   });
   
@@ -357,20 +395,55 @@ function setupEventListeners() {
   });
   
   // Bottom nav controls
+  let replaySpeed = 1;
+  
   document.querySelectorAll('.nav-control').forEach(btn => {
     btn.addEventListener('click', () => {
       const icon = btn.querySelector('.material-symbols-outlined');
-      if (icon) {
-        if (icon.textContent === 'restart_alt') {
-          resetSimulator();
-        } else if (icon.textContent === 'pause' || icon.textContent === 'play_arrow') {
-          const isActive = btn.classList.contains('active');
-          btn.classList.toggle('active');
-          icon.textContent = isActive ? 'play_arrow' : 'pause';
-        }
+      if (!icon) return;
+      
+      const iconName = icon.textContent.trim();
+      
+      if (iconName === 'restart_alt') {
+        resetSimulator();
+      } else if (iconName === 'pause' || iconName === 'play_arrow') {
+        const isActive = btn.classList.contains('active');
+        btn.classList.toggle('active');
+        icon.textContent = isActive ? 'play_arrow' : 'pause';
+      } else if (iconName === 'fast_rewind') {
+        replaySpeed = Math.max(0.5, replaySpeed - 0.5);
+        showReplaySpeedIndicator('rewind', replaySpeed);
+      } else if (iconName === 'fast_forward') {
+        replaySpeed = Math.min(4, replaySpeed + 0.5);
+        showReplaySpeedIndicator('forward', replaySpeed);
       }
     });
   });
+
+  function showReplaySpeedIndicator(direction, speed) {
+    let indicator = document.getElementById('replay-indicator');
+    if (!indicator) {
+      indicator = document.createElement('div');
+      indicator.id = 'replay-indicator';
+      indicator.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--surface-container-high);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 0.875rem;
+        color: var(--secondary);
+        z-index: 100;
+        animation: fadeInOut 1s ease-out forwards;
+      `;
+      document.body.appendChild(indicator);
+    }
+    indicator.textContent = `${direction === 'rewind' ? '←' : '→'} ${speed}x`;
+    setTimeout(() => indicator.remove(), 1000);
+  }
   
   // Model selector hover info
   // Keyboard shortcuts
