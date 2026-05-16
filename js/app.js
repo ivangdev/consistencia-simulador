@@ -102,8 +102,10 @@ export function performWrite() {
   const replica = replicaSelect.value;
   
   if (!varName) {
-    alert('Ingresá una variable (x, y, o z)');
-    return;
+    return; // Silently ignore empty variable names
+  }
+  if (!['x', 'y', 'z'].includes(varName)) {
+    return; // Silently ignore invalid variable names
   }
   if (isNaN(value)) {
     alert('Ingresá un valor numérico');
