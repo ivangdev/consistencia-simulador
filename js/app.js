@@ -3,6 +3,7 @@
  */
 
 import * as state from './state.js';
+import { incrementOps } from './state.js';
 import { CONSISTENCY_MODELS, getReadResult, getPropagationInfo } from './models.js';
 
 let logEntries = [];
@@ -149,8 +150,9 @@ export function performRead() {
   
   const result = getReadResult(model, replica, replicaData, replicas, varName);
   
-  addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${result.value} ${result.suffix}`, result.badge);
-  
+addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${result.value} ${result.suffix}`, result.badge);
+  incrementOps();
+
   highlightReplica(replica);
   renderReplicas();
   updateExplanation();
