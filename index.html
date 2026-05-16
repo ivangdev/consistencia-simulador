@@ -507,6 +507,8 @@
       justify-content: space-between;
       padding: 16px 24px;
       background: var(--surface-container);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid rgba(255,255,255,0.1);
       margin: -24px -24px 24px -24px;
     }
@@ -561,6 +563,7 @@
     .nav-item.active {
       color: var(--secondary);
       background: rgba(93, 230, 255, 0.1);
+      border-bottom: 2px solid var(--secondary);
     }
     
     .icon-btn {
