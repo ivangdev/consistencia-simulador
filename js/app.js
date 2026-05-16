@@ -547,6 +547,9 @@ export function hideTutorialModal() {
   }
 }
 
+// Expose globally for inline onclick handlers in HTML
+window.hideTutorialModal = hideTutorialModal;
+
 /**
  * Load log entries from memory (for persistence)
  */
