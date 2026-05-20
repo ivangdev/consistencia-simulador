@@ -305,3 +305,46 @@ body {
   border-radius: var(--radius);
   border: 1px solid var(--surface-2);
 }
+
+/* ── Simulator Banner (explanation) ── */
+.simulator-banner {
+  background: var(--surface-2);
+  border-top: 1px solid var(--border);
+  padding: 20px 24px;
+  margin-top: 32px;
+  border-radius: var(--radius);
+}
+
+.simulator-banner h3 {
+  margin: 0 0 10px 0;
+  font-size: 1rem;
+  color: var(--primary);
+}
+
+.simulator-banner p {
+  margin: 0 0 10px 0;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.banner-models {
+  margin: 8px 0 12px 20px;
+  padding: 0;
+}
+
+.banner-models li {
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.banner-models strong {
+  color: var(--text);
+}
+
+.banner-tip {
+  font-size: 0.82rem;
+  color: var(--accent) !important;
+}

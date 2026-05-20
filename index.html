@@ -77,6 +77,24 @@
         <div class="log-empty">Esperando operaciones...</div>
       </div>
     </section>
+
+    <footer class="simulator-banner">
+      <h3>🎯 ¿Qué demuestra este simulador?</h3>
+      <p>
+        Cada <strong>modelo de consistencia</strong> define cuándo y cómo una escritura en una réplica
+        se vuelve visible para las lecturas en otras réplicas. Este simulador te permite experimentar
+        con las diferencias entre ellos:
+      </p>
+      <ul class="banner-models">
+        <li><strong>Strict:</strong> Toda escritura se propaga instantáneamente a <em>todas</em> las réplicas. Cualquier lectura en cualquier réplica siempre ve el valor más reciente — nunca stale.</li>
+        <li><strong>Sequential:</strong> Escrituras síncronas a todas, pero las lecturas pueden ver valores ligeramente antiguos (lag de secuencia) si aún no se aplicó la última escritura.</li>
+        <li><strong>Causal:</strong> Las escrituras se propagan respetando el orden causal. Si escribir en A causa lógicamente una escritura en B, B recibirá la actualización en orden causal correcto.</li>
+        <li><strong>Eventual:</strong> Las escrituras solo se aplican a la réplica destino. Otras réplicas pueden tener valores antiguos (stale) mientras la propagación aún está pendiente.</li>
+      </ul>
+      <p class="banner-tip">
+        💡 <em>Prueba: escribe en A con Strict y lee en B. Luego haz lo mismo con Eventual y compara los resultados.</em>
+      </p>
+    </footer>
   </div>
 
   <script type="module" src="js/main.js"></script>

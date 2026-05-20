@@ -3,10 +3,17 @@
  */
 
 import { executeWrite, executeRead } from './models.js';
-import { setModel, resetState } from './state.js';
+import { setModel, resetState, getModel, incrementOps, getState } from './state.js';
+import { getPropagationInfo, getReadResult } from './models.js';
 import { renderAll } from './render.js';
 import { VARIABLES } from './state.js';
 import { hideTutorial } from './tutorial.js';
+
+function addLogEntry(type, operation, result, badge = null) {
+  const state = getState();
+  state.operationLog.unshift({ type, operation, result, badge, timestamp: state.operationCount, id: Date.now() });
+  state.operationCount++;
+}
 
 export function setupEventListeners() {
   const modelSelect = document.getElementById('model-select');
@@ -52,7 +59,11 @@ function handleWrite() {
   const valueStr = valueInput.value.trim();
   const replica = replicaSelect.value;
 
-  if (!varName || !VARIABLES.includes(varName)) {
+  if (!varName) {
+    alert('Ingresá una variable (x, y, o z).');
+    return;
+  }
+  if (!VARIABLES.includes(varName)) {
     alert('Variable inválida. Usa x, y, o z.');
     return;
   }
@@ -65,8 +76,12 @@ function handleWrite() {
 
   try {
     executeWrite(varName, value, replica);
+    const model = getModel();
+    const propagation = getPropagationInfo(model, replica, varName, value);
+    addLogEntry('write', `Write(${varName}=${value}) @ ${replica}`, propagation.message, propagation.badge);
     renderAll();
-    varInput.value = '';
+    // Keep var name, clear value only
+    varInput.value = varName;
     valueInput.value = '';
   } catch (err) {
     alert(err.message);
@@ -89,6 +104,11 @@ function handleRead() {
 
   try {
     executeRead(varName, replica);
+    const replicas = getState().replicas;
+    const model = getModel();
+    const replicaData = replicas[replica];
+    const displayResult = getReadResult(model, replica, replicaData, replicas, varName);
+    addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${displayResult.value} ${displayResult.suffix}`, displayResult.badge);
     renderAll();
     varInput.value = '';
   } catch (err) {

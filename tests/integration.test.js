@@ -106,3 +106,31 @@ test('model selector changes behavior (strict vs eventual differ)', async ({ pag
   expect(await page.textContent('#var-B-x')).toBe('2');
   expect(await page.textContent('#var-C-x')).toBe('2');
 });
+test('strict read sees latest write even from different replica', async ({ page }) => {
+  // Write x=1 @ A
+  await page.selectOption('#model-select', 'strict');
+  await page.fill('#write-var', 'x');
+  await page.fill('#write-value', '1');
+  await page.selectOption('#write-replica', 'A');
+  await page.click('#btn-write');
+  await page.waitForTimeout(200);
+
+  // Write x=99 @ C (latest)
+  await page.fill('#write-value', '99');
+  await page.selectOption('#write-replica', 'C');
+  await page.click('#btn-write');
+  await page.waitForTimeout(200);
+
+  // Read x @ B — in strict, should get 99 (latest across all replicas), not 0 or 1
+  await page.fill('#read-var', 'x');
+  await page.selectOption('#read-replica', 'B');
+  await page.click('#btn-read');
+  await page.waitForTimeout(200);
+
+  const logEntries = await page.$$('.log-entry');
+  expect(logEntries.length).toBeGreaterThanOrEqual(3);
+  
+  // The latest read entry should show x=99 (not stale since strict always returns latest)
+  const lastResult = await page.$$eval('.log-result', els => els.map(e => e.textContent));
+  expect(lastResult[0]).toContain('99');
+});

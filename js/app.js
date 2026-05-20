@@ -4,6 +4,7 @@
 
 import * as state from './state.js';
 import { incrementOps } from './state.js';
+import { executeWrite, executeRead } from './models.js';
 import { CONSISTENCY_MODELS, getReadResult, getPropagationInfo } from './models.js';
 
 let logEntries = [];
@@ -112,13 +113,13 @@ export function performWrite() {
     alert('Ingresá un valor numérico');
     return;
   }
-  
-  const newState = state.updateReplica(replica, varName, value);
-  const model = newState.model;
-  
+
+  executeWrite(varName, value, replica);
+  const model = state.getModel();
+
   const propagation = getPropagationInfo(model, replica, varName, value);
-  
   addLogEntry('write', `Write(${varName}=${value}) @ ${replica}`, propagation.message, propagation.badge);
+  incrementOps();
   
   highlightReplica(replica);
   renderReplicas();
@@ -143,14 +144,15 @@ export function performRead() {
     alert('Ingresá una variable (x, y, o z)');
     return;
   }
-  
+
+  const result = executeRead(varName, replica);
   const replicas = state.getReplicas();
   const model = state.getModel();
   const replicaData = replicas[replica];
-  
-  const result = getReadResult(model, replica, replicaData, replicas, varName);
-  
-addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${result.value} ${result.suffix}`, result.badge);
+
+  const displayResult = getReadResult(model, replica, replicaData, replicas, varName);
+
+  addLogEntry('read', `Read(${varName}) @ ${replica}`, `→ ${displayResult.value} ${displayResult.suffix}`, displayResult.badge);
   incrementOps();
 
   highlightReplica(replica);

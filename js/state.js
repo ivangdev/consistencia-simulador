@@ -56,3 +56,20 @@ export function addLogEntry(entry) {
   });
   state.operationCount++;
 }
+
+export function incrementOps() {
+  const state = getState();
+  state.operationCount++;
+}
+
+export function updateReplica(replicaId, varName, value) {
+  const state = getState();
+  if (!['x', 'y', 'z'].includes(varName)) return state;
+  state.replicas[replicaId][varName] = value;
+  return state;
+}
+
+export function readFromReplica(replicaId, varName) {
+  const state = getState();
+  return state.replicas[replicaId][varName] ?? 0;
+}
