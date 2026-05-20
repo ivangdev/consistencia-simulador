@@ -15,7 +15,7 @@ const STEPS = [
   {
     target: '.replicas-grid',
     title: 'Réplicas del Sistema',
-    body: 'Tienes 3 réplicas (A, B, C). Cada una mantiene su propia copia de x, y, z. En modelos síncronos (Strict) se mantienen idénticas; en otros pueden divergir temporalmente.',
+    body: 'Tienes 3 réplicas (A, B, C). Cada una mantiene su propia copia de x, y, z. En Strict y Sequential se mantienen idénticas; en Causal y Eventual pueden divergir temporalmente.',
     position: 'bottom',
   },
   {
@@ -33,7 +33,7 @@ const STEPS = [
   {
     target: '#model-select',
     title: 'Modelo de Consistencia',
-    body: '4 modelos disponibles:\n• Strict: Siempre lee el último valor escrito. Síncrono.\n• Sequential: Orden global, pero puede haber lecturas stale.\n• Causal: Orden causal preservado, pero sin orden total.\n• Eventual: Máxima performance, lecturas pueden estar stale.',
+    body: '4 modelos disponibles:\n• Strict: Escritura síncrona a todas las réplicas. Cualquier lectura siempre ve el valor más reciente — nunca stale.\n• Sequential: Escritura síncrona a todas, pero las lecturas pueden ver valores ligeramente antiguos (lag de secuencia).\n• Causal: Las escrituras se propagan respetando el orden causal. Si escribir en A causa lógicamente una escritura en B, B la recibirá en orden causal correcto.\n• Eventual: La escritura solo se aplica a la réplica destino. Otras réplicas pueden tener valores antiguos (stale) mientras la propagación está pendiente.',
     position: 'bottom',
   },
   {
