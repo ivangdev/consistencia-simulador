@@ -7,6 +7,13 @@ const TUTORIAL_KEY = 'consistencia-simulador-tutorial-v1';
 
 const STEPS = [
   {
+    target: null,
+    title: 'Demo del Simulador',
+    body: '',
+    isGif: true,
+    position: 'center',
+  },
+  {
     target: '.replicas-grid',
     title: 'Réplicas del Sistema',
     body: 'Tienes 3 réplicas (A, B, C) que simulan servidores distribuidos. Cada una mantiene su propia copia de las variables x, y, z.',
@@ -76,6 +83,14 @@ function renderTutorialStep() {
   removeExisting();
 
   const step = STEPS[currentStep];
+
+  // GIF step — show the demo image centered
+  if (step.isGif) {
+    const tooltip = buildGifStep(step, currentStep);
+    document.body.appendChild(tooltip);
+    return;
+  }
+
   const targetEl = document.querySelector(step.target);
   if (!targetEl) {
     // Element not found, skip to next
@@ -130,6 +145,41 @@ function buildTooltip(step, idx) {
   div.querySelector('#tut-finish')?.addEventListener('click', () => {
     completeTutorial();
     hideTutorial();
+  });
+
+  div.querySelector('#tut-skip')?.addEventListener('click', () => {
+    completeTutorial();
+    hideTutorial();
+  });
+
+  return div;
+}
+
+function buildGifStep(step, idx) {
+  const div = document.createElement('div');
+  div.id = 'tutorial-overlay';
+
+  const progress = `${idx + 1}/${STEPS.length}`;
+
+  div.innerHTML = `
+    <div class="tutorial-card tutorial-card-center">
+      <div class="tutorial-header">
+        <span class="tutorial-step">Paso ${idx + 1}</span>
+        <span class="tutorial-progress">${progress}</span>
+      </div>
+      <h3 class="tutorial-title">${step.title}</h3>
+      <img class="tutorial-gif" src="consistencia-demo.gif" alt="Demo del simulador" />
+      <p class="tutorial-body">Mira cómo funciona el simulador. Luego exploraremos cada parte.</p>
+      <div class="tutorial-actions">
+        <button class="tutorial-btn tutorial-btn-next" id="tut-next">Siguiente →</button>
+      </div>
+      <button class="tutorial-skip" id="tut-skip">Saltar tutorial</button>
+    </div>
+  `;
+
+  div.querySelector('#tut-next')?.addEventListener('click', () => {
+    currentStep++;
+    renderTutorialStep();
   });
 
   div.querySelector('#tut-skip')?.addEventListener('click', () => {
