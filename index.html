@@ -86,13 +86,16 @@
         con las diferencias entre ellos:
       </p>
       <ul class="banner-models">
-        <li><strong>Strict:</strong> Toda escritura se propaga instantáneamente a <em>todas</em> las réplicas. Cualquier lectura en cualquier réplica siempre ve el valor más reciente — nunca stale.</li>
-        <li><strong>Sequential:</strong> Escrituras síncronas a todas, pero las lecturas pueden ver valores ligeramente antiguos (lag de secuencia) si aún no se aplicó la última escritura.</li>
-        <li><strong>Causal:</strong> Las escrituras se propagan respetando el orden causal. Si escribir en A causa lógicamente una escritura en B, B recibirá la actualización en orden causal correcto.</li>
-        <li><strong>Eventual:</strong> Las escrituras solo se aplican a la réplica destino. Otras réplicas pueden tener valores antiguos (stale) mientras la propagación aún está pendiente.</li>
+        <li><strong>Strict:</strong> Toda escritura se propaga instantáneamente a <em>todas</em> las réplicas. Cualquier lectura siempre ve el valor más reciente — <strong>nunca stale</strong>. Badge: <code>sync</code>.</li>
+        <li><strong>Sequential:</strong> Escrituras síncronas a todas, pero las lecturas pueden ver valores ligeramente antiguos si la secuencia local está retrasada. Badge: <code>⚠️ stale</code> o <code>sync</code>.</li>
+        <li><strong>Causal:</strong> Las escrituras se propagan respetando el orden causal. Si escribir en A causa lógicamente una escritura en B, B la recibirá en orden causal correcto. Badge: <code>causal</code> o <code>⚠️ causal</code>.</li>
+        <li><strong>Eventual:</strong> La escritura solo se aplica a la réplica destino. Otras réplicas pueden tener valores antiguos (stale) mientras la propagación está pendiente. Badge: <code>async</code>.</li>
       </ul>
       <p class="banner-tip">
-        💡 <em>Prueba: escribe en A con Strict y lee en B. Luego haz lo mismo con Eventual y compara los resultados.</em>
+        💡 <em><strong>¿Qué es "stale"?</strong> Un valor <em>stale</em> es uno desactualizado — la réplica aún no recibió la última escritura. En Eventual es común y se corrige solo cuando la propagación termina. En Strict nunca ocurre. Las entradas del log con <code>⚠️</code> indican que leíste un valor que no era el más reciente.</em>
+      </p>
+      <p class="banner-tip">
+        💡 <em>Prueba: escribe en A con Strict y lee en B (siempre ve el último valor). Luego haz lo mismo con Eventual y compara — B puede devolver un valor antiguo mientras la propagación está pendiente.</em>
       </p>
     </footer>
   </div>
