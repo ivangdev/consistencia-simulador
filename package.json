@@ -1,0 +1,7 @@
+{
+  "name": "consistencia-simulador",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.40.0"
+  }
+}

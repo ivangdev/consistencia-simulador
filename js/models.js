@@ -1,143 +1,73 @@
 /**
- * Consistency Model Rules
- * Defines behavior for each consistency model
+ * models.js — Pure consistency logic
+ * No DOM, no side effects.
  */
 
-export const CONSISTENCY_MODELS = {
-  strict: {
-    name: 'Strict',
-    description: 'Todas las operaciones de escritura son visibles instantáneamente en todas las réplicas. Garantía máxima pero imposible en sistemas distribuidos reales.',
-    rules: [
-      'Toda lectura ve el valor más reciente escrito',
-      'No existen stale reads',
-      'Orden total de operaciones'
-    ],
-    propagateImmediately: true
-  },
-  sequential: {
-    name: 'Sequential',
-    description: 'Todas las operaciones aparecen en el mismo orden en todas las réplicas, como si fueran ejecutadas en un solo procesador.',
-    rules: [
-      'Reads ven todos los writes en orden',
-      'No hay reads no-monotónicos',
-      'Todas las réplicas acuerdan el orden'
-    ],
-    propagateImmediately: true
-  },
-  causal: {
-    name: 'Causal',
-    description: 'Writes que están causalmente relacionados son vistos en el mismo orden por todas las réplicas. Writes independientes pueden verse en diferente orden.',
-    rules: [
-      'Reads respetan relaciones causa-efecto',
-      'Writes causalmente relacionados se ordenan juntos',
-      'Writes concurrentes pueden tener orden diferente'
-    ],
-    propagateImmediately: false,
-    trackCausality: true
-  },
-  eventual: {
-    name: 'Eventual',
-    description: 'Las réplicas eventualmente convergen al mismo valor si no hay más writes. No hay garantías sobre el orden o timing de lecturas.',
-    rules: [
-      'Sin garantías en el orden de reads',
-      'Stale reads son posibles',
-      'Eventualmente todas las réplicas convergen'
-    ],
-    propagateImmediately: false,
-    eventualConsistency: true
+import { getState, getReplicas, addLogEntry } from './state.js';
+import { VARIABLES, REPLICAS } from './state.js';
+
+function validateVar(varName) {
+  const v = varName?.trim?.().toLowerCase();
+  if (!v || !VARIABLES.includes(v)) {
+    throw new Error(`Invalid variable: ${varName}`);
   }
-};
-
-/**
- * Check if a write should propagate immediately based on model
- */
-export function shouldPropagateImmediately(model) {
-  return CONSISTENCY_MODELS[model]?.propagateImmediately ?? false;
+  return v;
 }
 
-/**
- * Check if a replica might have stale data
- */
-export function mightHaveStaleData(model, replicaId, otherReplicas) {
-  if (model === 'strict' || model === 'sequential') {
-    return false;
+export function executeWrite(varName, value, targetReplica) {
+  const var_ = validateVar(varName);
+  if (!REPLICAS.includes(targetReplica)) {
+    throw new Error(`Invalid replica: ${targetReplica}`);
   }
-  if (model === 'causal') {
-    return false; // Causal guarantees prevent staleness
-  }
-  if (model === 'eventual') {
-    return Object.values(otherReplicas).some(r => 
-      JSON.stringify(r) !== JSON.stringify(otherReplicas[replicaId])
-    );
-  }
-  return false;
-}
+  const state = getState();
+  const model = state.model;
 
-/**
- * Get read result info based on model
- */
-export function getReadResult(model, replicaId, replicaData, allReplicas, varName) {
-  const modelInfo = CONSISTENCY_MODELS[model];
-  
+  let updatedReplicas = { ...state.replicas };
+
   if (model === 'strict' || model === 'sequential') {
-    return {
-      value: replicaData[varName] ?? 0,
-      suffix: ' (valor actualizado)',
-      badge: 'ok'
-    };
-  }
-  
-  if (model === 'causal') {
-    return {
-      value: replicaData[varName] ?? 0,
-      suffix: ' (causalmente consistente)',
-      badge: 'ok'
-    };
-  }
-  
-  if (model === 'eventual') {
-    const hasStale = Object.entries(allReplicas).some(([id, data]) => {
-      return id !== replicaId && data[varName] !== replicaData[varName];
-    });
-    
-    if (hasStale) {
-      return {
-        value: replicaData[varName] ?? 0,
-        suffix: ' (⚠️ posible stale read)',
-        badge: 'stale'
-      };
+    for (const r of REPLICAS) {
+      updatedReplicas[r] = { ...updatedReplicas[r], [var_]: value };
     }
-    return {
-      value: replicaData[varName] ?? 0,
-      suffix: ' (valor actualizado)',
-      badge: 'ok'
-    };
+  } else {
+    updatedReplicas[targetReplica] = { ...updatedReplicas[targetReplica], [var_]: value };
   }
-  
-  return {
-    value: replicaData[varName] ?? 0,
-    suffix: '',
-    badge: 'ok'
-  };
+
+  state.replicas = updatedReplicas;
+
+  const label = (model === 'strict' || model === 'sequential') ? 'A,B,C' : targetReplica;
+  addLogEntry({
+    type: 'write',
+    operation: `Write(${var_}=${value}) @ ${label}`,
+    result: `value=${value}`,
+    replica: targetReplica,
+  });
+
+  return updatedReplicas;
 }
 
-/**
- * Get propagation info after a write
- */
-export function getPropagationInfo(model, writeReplica, varName, value) {
-  if (model === 'strict') {
-    return { message: 'Propagado instantáneamente a todas las réplicas', badge: 'ok' };
+export function executeRead(varName, targetReplica) {
+  const var_ = validateVar(varName);
+  if (!REPLICAS.includes(targetReplica)) {
+    throw new Error(`Invalid replica: ${targetReplica}`);
   }
-  if (model === 'sequential') {
-    return { message: 'Orden garantizado en todas las réplicas', badge: 'ok' };
-  }
-  if (model === 'causal') {
-    return { message: 'Propagado según dependencias causales', badge: 'ok' };
-  }
+  const state = getState();
+  const model = state.model;
+
+  let value = state.replicas[targetReplica][var_];
+  let stale = false;
+
   if (model === 'eventual') {
-    return { message: 'Propagación eventual — sin garantías de timing', badge: 'warning' };
+    const allValues = REPLICAS.map(r => state.replicas[r][var_]);
+    stale = !allValues.every(v => v === value);
   }
-  return { message: 'Propagación completada', badge: 'ok' };
-}
 
-export default CONSISTENCY_MODELS;
+  addLogEntry({
+    type: 'read',
+    operation: `Read(${var_}) @ ${targetReplica}`,
+    result: `value=${value}${stale ? ' (stale)' : ''}`,
+    replica: targetReplica,
+    stale,
+  });
+
+  return { value, replica: targetReplica, stale };
+}

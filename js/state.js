@@ -1,165 +1,58 @@
 /**
- * State Management for Consistency Simulator
+ * State — single source of truth
+ * All state changes go through functions in this file.
  */
 
-const INITIAL_STATE = {
+export const VARIABLES = ['x', 'y', 'z'];
+export const REPLICAS = ['A', 'B', 'C'];
+export const MODELS = ['strict', 'sequential', 'causal', 'eventual'];
+
+export const INITIAL_STATE = Object.freeze({
+  model: 'eventual',
   replicas: {
     A: { x: 0, y: 0, z: 0 },
     B: { x: 0, y: 0, z: 0 },
-    C: { x: 0, y: 0, z: 0 }
+    C: { x: 0, y: 0, z: 0 },
   },
-  model: 'sequential',
+  operationLog: [],
   operationCount: 0,
-  lastWriteReplica: null,
-  lastWriteVar: null,
-  lastWriteValue: null,
-  causalHistory: [],
-  tutorialCompleted: false
-};
+});
 
-/**
- * Get current state (from localStorage or initial)
- */
+let _state = null;
+
 export function getState() {
-  const saved = localStorage.getItem('consistency-sim-state');
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch {
-      return JSON.parse(JSON.stringify(INITIAL_STATE));
-    }
+  if (!_state) {
+    _state = JSON.parse(JSON.stringify(INITIAL_STATE));
   }
-  return JSON.parse(JSON.stringify(INITIAL_STATE));
+  return _state;
 }
 
-/**
- * Save state to localStorage
- */
-export function saveState(state) {
-  localStorage.setItem('consistency-sim-state', JSON.stringify(state));
+export function resetState() {
+  _state = JSON.parse(JSON.stringify(INITIAL_STATE));
+  return _state;
 }
 
-/**
- * Update replica value
- * For strict/sequential: propagate to ALL replicas immediately
- * For causal/eventual: only update the target replica (eventual propagates lazily)
- */
-export function updateReplica(replicaId, varName, value) {
-  // Validate variable name - only x, y, z allowed
-  if (!['x', 'y', 'z'].includes(varName)) {
-    return getState(); // Silently reject invalid variable names
+export function setModel(model) {
+  if (!MODELS.includes(model)) {
+    throw new Error(`Invalid model: ${model}`);
   }
-  
+  getState().model = model;
+}
+
+export function getModel() {
+  return getState().model;
+}
+
+export function getReplicas() {
+  return getState().replicas;
+}
+
+export function addLogEntry(entry) {
   const state = getState();
-  state.replicas[replicaId][varName] = value;
-  
-  // Strict and Sequential: propagate immediately to all replicas
-  if (state.model === 'strict' || state.model === 'sequential') {
-    const otherReplicas = ['A', 'B', 'C'].filter(id => id !== replicaId);
-    otherReplicas.forEach(id => {
-      state.replicas[id][varName] = value;
-    });
-  }
-  // Causal and Eventual: only update target replica (lazy propagation)
-  // No automatic propagation - replicas sync asynchronously
-  
-  state.lastWriteReplica = replicaId;
-  state.lastWriteVar = varName;
-  state.lastWriteValue = value;
-  state.causalHistory.push({
-    replica: replicaId,
-    var: varName,
-    value,
-    time: Date.now()
+  state.operationLog.unshift({
+    ...entry,
+    timestamp: state.operationCount,
+    id: Date.now(),
   });
   state.operationCount++;
-  saveState(state);
-  return state;
 }
-
-/**
- * Read from replica
- */
-export function readFromReplica(replicaId, varName) {
-  const state = getState();
-  return state.replicas[replicaId][varName] ?? 0;
-}
-
-/**
- * Get all replicas data
- */
-export function getReplicas() {
-  const state = getState();
-  return state.replicas;
-}
-
-/**
- * Get current consistency model
- */
-export function getModel() {
-  const state = getState();
-  return state.model;
-}
-
-/**
- * Set consistency model
- */
-export function setModel(model) {
-  const state = getState();
-  state.model = model;
-  saveState(state);
-  return state;
-}
-
-/**
- * Reset state to initial
- */
-export function resetState() {
-  // Deep clone to avoid mutating INITIAL_STATE
-  const state = JSON.parse(JSON.stringify(INITIAL_STATE));
-  state.model = 'sequential'; // Reset to default model
-  saveState(state);
-  return state;
-}
-
-/**
- * Increment operation count
- */
-export function incrementOps() {
-  const state = getState();
-  state.operationCount++;
-  saveState(state);
-  return state;
-}
-
-/**
- * Mark tutorial as completed
- */
-export function completeTutorial() {
-  const state = getState();
-  state.tutorialCompleted = true;
-  saveState(state);
-  return state;
-}
-
-/**
- * Check if tutorial was completed
- */
-export function isTutorialCompleted() {
-  const state = getState();
-  return state.tutorialCompleted;
-}
-
-export default {
-  getState,
-  saveState,
-  updateReplica,
-  readFromReplica,
-  getReplicas,
-  getModel,
-  setModel,
-  resetState,
-  incrementOps,
-  completeTutorial,
-  isTutorialCompleted
-};
