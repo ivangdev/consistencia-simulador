@@ -34,7 +34,7 @@ const STEPS = [
   {
     target: '#model-select',
     title: 'Modelo de Consistencia',
-    body: '4 modelos disponibles:\n• Strict: Siempre lee el último valor escrito. Síncrono.\n• Sequential: Las operaciones respetan un orden global, pero pueden haber lecturas stale.\n• Causal: Mantiene orden causal, pero no garantiza orden total.\n• Eventual: Las escrituras se propagan eventualmente. Máxima、性能, pero puede haber lecturas stale.',
+    body: '4 modelos disponibles:\n• Strict: Siempre lee el último valor escrito. Síncrono.\n• Sequential: Las operaciones respetan un orden global, pero pueden haber lecturas stale.\n• Causal: Mantiene orden causal, pero no garantiza orden total.\n• Eventual: Las escrituras se propagan eventualmente. Máxima性能的, pero puede haber lecturas stale.',
     position: 'bottom',
   },
   {
@@ -74,9 +74,14 @@ export function startTutorial() {
 }
 
 export function resetTutorial() {
+  try {
+    localStorage.removeItem(TUTORIAL_KEY);
+  } catch {}
   currentStep = 0;
-  completeTutorial();
-  hideTutorial();
+  removeExisting();
+  if (!isTutorialDone()) {
+    renderTutorialStep();
+  }
 }
 
 function renderTutorialStep() {
@@ -93,7 +98,6 @@ function renderTutorialStep() {
 
   const targetEl = document.querySelector(step.target);
   if (!targetEl) {
-    // Element not found, skip to next
     currentStep++;
     if (currentStep < STEPS.length) {
       setTimeout(renderTutorialStep, 100);
@@ -203,12 +207,11 @@ function positionTooltip(tooltip, targetEl, position) {
     if (position === 'bottom') {
       top = rect.bottom + 8 + window.scrollY;
       left = rect.left + (rect.width / 2) - (cardRect.width / 2);
-    } else {
+    } else if (position === 'top') {
       top = rect.top - cardRect.height - 8 + window.scrollY;
       left = rect.left + (rect.width / 2) - (cardRect.width / 2);
     }
 
-    // Clamp to viewport
     left = Math.max(8, Math.min(left, window.innerWidth - cardRect.width - 8));
 
     card.style.position = 'absolute';
