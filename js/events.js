@@ -6,12 +6,14 @@ import { executeWrite, executeRead } from './models.js';
 import { setModel, resetState } from './state.js';
 import { renderAll } from './render.js';
 import { VARIABLES } from './state.js';
+import { hideTutorial } from './tutorial.js';
 
 export function setupEventListeners() {
   const modelSelect = document.getElementById('model-select');
   if (modelSelect) {
     modelSelect.addEventListener('change', (e) => {
       setModel(e.target.value);
+      hideTutorial();
       renderAll();
     });
   }
@@ -40,6 +42,8 @@ export function setupEventListeners() {
 }
 
 function handleWrite() {
+  hideTutorial();
+
   const varInput = document.getElementById('write-var');
   const valueInput = document.getElementById('write-value');
   const replicaSelect = document.getElementById('write-replica');
@@ -70,6 +74,8 @@ function handleWrite() {
 }
 
 function handleRead() {
+  hideTutorial();
+
   const varInput = document.getElementById('read-var');
   const replicaSelect = document.getElementById('read-replica');
 

@@ -229,3 +229,17 @@ function removeExisting() {
 function hideTutorial() {
   removeExisting();
 }
+
+// Auto-dismiss tutorial overlay when user interacts with controls
+export function setupTutorialDismiss() {
+  ['#btn-write', '#btn-read', '#btn-reset', '#model-select', '#write-var',
+   '#write-value', '#read-var'].forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el) {
+      el.addEventListener('click', hideTutorial, { once: true });
+      el.addEventListener('change', hideTutorial, { once: true });
+    }
+  });
+}
+
+export { hideTutorial };

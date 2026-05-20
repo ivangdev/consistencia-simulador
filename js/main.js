@@ -5,7 +5,7 @@
 import { renderAll } from './render.js';
 import { setupEventListeners } from './events.js';
 import { resetState, getModel } from './state.js';
-import { startTutorial } from './tutorial.js';
+import { startTutorial, setupTutorialDismiss } from './tutorial.js';
 
 export function init() {
   resetState();
@@ -15,6 +15,7 @@ export function init() {
 
   renderAll();
   setupEventListeners();
+  setupTutorialDismiss();
   setupTutorialHelp();
 
   // Start interactive tutorial on first visit
